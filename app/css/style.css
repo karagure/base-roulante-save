@@ -11,6 +11,21 @@ header {
   padding: 12px 16px;
 }
 header h1 { margin: 0 0 8px; font-size: 1.3rem; }
+.link-record {
+  display: inline-block;
+  color: #9fd3ff;
+  text-decoration: none;
+  font-size: .9rem;
+  margin-bottom: 8px;
+}
+.link-record:hover { text-decoration: underline; }
+.back-link {
+  display: inline-block;
+  color: #1c2733;
+  text-decoration: none;
+  font-size: 1.4rem;
+  padding: 8px 12px;
+}
 .conn { display: flex; align-items: center; gap: 12px; }
 button {
   cursor: pointer;
@@ -42,18 +57,60 @@ button:disabled { background: #888; cursor: not-allowed; }
 .tab-panel { display: none; padding: 16px; }
 .tab-panel.active { display: block; }
 
-/* Télécommande */
-.pad { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.pad-mid { display: flex; gap: 8px; }
-.dir {
-  width: 70px; height: 70px;
-  font-size: 1.6rem;
-  background: #2d7dd2;
-  user-select: none;
+/* Télécommande : joystick virtuel */
+.joystick-wrap { display: flex; justify-content: center; padding: 12px 0; }
+.joystick-base {
+  position: relative;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: #dfe3e8;
+  border: 2px solid #b0b8c1;
   touch-action: none;
+  user-select: none;
 }
-.dir.stop { background: #c0392b; }
+.joystick-knob {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 70px; height: 70px;
+  margin: -35px 0 0 -35px;
+  border-radius: 50%;
+  background: #2d7dd2;
+  touch-action: none;
+  pointer-events: none;
+}
 .speed-row { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
+
+/* Auto */
+.auto-panel { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.auto-panel .danger { background: #c0392b; }
+
+/* Enregistrement parcours */
+.record-header { display: flex; align-items: center; gap: 12px; }
+.record-panel { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 16px; }
+.points-row { display: flex; align-items: center; gap: 10px; }
+.points-row button.active-point { outline: 3px solid #2e7a3f; }
+.point-badge {
+  padding: 6px 14px;
+  border-radius: 14px;
+  background: #e3e6ea;
+  font-weight: 600;
+}
+.record-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.record-actions .danger { background: #c0392b; }
+#record-log {
+  width: 100%;
+  max-width: 360px;
+  max-height: 160px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-family: monospace;
+  font-size: .85rem;
+}
+#record-log div { padding: 2px 0; }
+[disabled] { opacity: .55; }
 
 /* Blockly */
 #blockly { height: 420px; width: 100%; background: #fff; border: 1px solid #ccc; }

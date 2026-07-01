@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Base roulante — Enregistrement parcours</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="record-header">
+      <a href="index.html" class="back-link" aria-label="Retour">←</a>
+      <h1>Enregistrement parcours</h1>
+    </div>
+    <div class="conn">
+      <button id="btn-connect">Connecter (BLE)</button>
+      <span id="status" class="status off">Déconnecté</span>
+    </div>
+    <div id="telemetry" class="telemetry">—</div>
+  </header>
+
+  <section class="record-panel">
+    <div class="joystick-wrap">
+      <div id="joystick-base" class="joystick-base">
+        <div id="joystick-knob" class="joystick-knob"></div>
+      </div>
+    </div>
+
+    <div class="points-row">
+      <button id="btn-point-a" class="point-badge active-point">Point A</button>
+      <button id="btn-record-step">Enregistrer cette étape</button>
+      <button id="btn-point-b" class="point-badge" hidden>Point B</button>
+    </div>
+
+    <p>Position actuelle : <strong id="current-position">A</strong></p>
+
+    <div class="record-actions">
+      <button id="btn-clear" class="danger">Supprimer les points enregistrés</button>
+    </div>
+
+    <div id="record-log"></div>
+  </section>
+
+  <script src="js/ble.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/joystick.js"></script>
+  <script src="js/record.js"></script>
+</body>
+</html>

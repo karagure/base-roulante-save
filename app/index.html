@@ -10,6 +10,7 @@
 <body>
   <header>
     <h1>Base roulante</h1>
+    <a href="record.html" class="link-record">Enregistrement parcours →</a>
     <div class="conn">
       <button id="btn-connect">Connecter (BLE)</button>
       <span id="status" class="status off">Déconnecté</span>
@@ -19,23 +20,28 @@
 
   <nav class="tabs">
     <button class="tab active" data-tab="remote">Télécommande</button>
+    <button class="tab" data-tab="auto">Auto</button>
     <button class="tab" data-tab="blocks">Code bloc</button>
   </nav>
 
   <section id="tab-remote" class="tab-panel active">
-    <div class="pad">
-      <button class="dir" data-dir="MF">▲</button>
-      <div class="pad-mid">
-        <button class="dir" data-dir="ML">◄</button>
-        <button class="dir stop" data-dir="MS">■</button>
-        <button class="dir" data-dir="MR">►</button>
+    <div class="joystick-wrap">
+      <div id="joystick-base" class="joystick-base">
+        <div id="joystick-knob" class="joystick-knob"></div>
       </div>
-      <button class="dir" data-dir="MB">▼</button>
     </div>
     <div class="speed-row">
       <label for="speed">Vitesse :</label>
       <input type="range" id="speed" min="0" max="255" value="200">
       <span id="speed-val">200</span>
+    </div>
+  </section>
+
+  <section id="tab-auto" class="tab-panel">
+    <div class="auto-panel">
+      <button id="btn-auto-start">Mode déplacement autonome</button>
+      <button id="btn-auto-stop" class="danger">Arrêt mode autonome</button>
+      <p>État : <span id="auto-indicator" class="status off">Inactif</span></p>
     </div>
   </section>
 
@@ -50,7 +56,9 @@
 
   <script src="js/ble.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/joystick.js"></script>
   <script src="js/remote.js"></script>
+  <script src="js/auto.js"></script>
   <script src="js/blocks.js"></script>
 </body>
 </html>

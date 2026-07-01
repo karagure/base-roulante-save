@@ -24,6 +24,7 @@ std::string telemetry() {
     int d = sonar.readDistanceCm();
     const char* st = nav.state() == NavState::Executing    ? "EXEC"
                    : nav.state() == NavState::ObstacleHold ? "HOLD"
+                   : nav.state() == NavState::AutoAvoid     ? "AUTO"
                    : manualMode                             ? "MAN"
                    :                                          "IDLE";
     if (env.isValid()) {
@@ -74,6 +75,11 @@ void handleLine(const std::string& line) {
             manualMode = false;
             nav.setPath(c.moves);
             ble.notify("OK SEQ " + std::to_string(c.moves.size()));
+            break;
+        case CommandKind::Auto:
+            manualMode = false;
+            nav.startAuto();
+            ble.notify("OK AUTO");
             break;
         default:
             ble.notify("ERR: commande inconnue");

@@ -15,8 +15,26 @@ lib/                 Modules firmware (Motor, Drivetrain, UltrasonicSensor,
 src/main.cpp         Câblage : routeur de commandes, télémétrie, failsafe
 test/                Tests unitaires natifs (Unity) : parsing + timing
 app/                 App web statique (Web Bluetooth + Blockly)
+app/record.html      Page d'enregistrement de parcours (point A / point B)
 docs/superpowers/    Spécification + plans d'implémentation
 ```
+
+## Architecture en couches
+
+Le firmware (`lib/`) suit deux couches :
+
+| Couche | Modules | Rôle |
+|---|---|---|
+| **Application** | `Navigator`, `CommandParser` | logique métier : interprétation des commandes texte, séquencement des déplacements, évitement d'obstacle |
+| **HAL** (Hardware Abstraction Layer) | `Motor`, `Drivetrain`, `UltrasonicSensor`, `EnvironmentSensor`, `BleLink`, `Motion` | accès direct au matériel (PWM moteurs, capteurs, BLE) et calculs de bas niveau (durées en dead reckoning) |
+
+Il n'y a volontairement **pas de couche Contrôle** (pas d'asservissement
+PID, pas d'odométrie) : le robot n'a pas d'encodeurs sur les moteurs, donc
+aucune mesure de retour (vitesse réelle, distance parcourue) n'est
+disponible pour fermer une boucle de contrôle. Les déplacements reposent
+uniquement sur du dead reckoning en boucle ouverte (durée = distance ou
+angle × calibration dans `Config.h`). C'est un choix assumé lié au matériel
+disponible, pas un oubli.
 
 ## Câblage (broches par défaut, voir `include/Config.h`)
 
@@ -64,8 +82,19 @@ python3 -m http.server 8000 --directory app
 ```
 
 1. Cliquer **Connecter (BLE)** → choisir `BaseRoulante`.
-2. Onglet **Télécommande** : flèches (maintien = avance continue) + vitesse.
-3. Onglet **Code bloc** : assembler les blocs → **Exécuter ▶** envoie la séquence.
+2. Onglet **Télécommande** : joystick virtuel (maintien dans une direction =
+   avance continue, commande répétée toutes les 200 ms pour respecter le
+   watchdog firmware) + vitesse.
+3. Onglet **Auto** : démarrer/arrêter le mode déplacement automatique
+   (commande `AUTO` / `STOP`), avec indicateur actif/inactif basé sur la
+   télémétrie.
+4. Onglet **Code bloc** : assembler les blocs → **Exécuter ▶** envoie la séquence.
+5. Lien **Enregistrement parcours** (en haut de page) → `record.html` :
+   piloter le robot au joystick jusqu'à un point B, cliquer **Enregistrer
+   cette étape** pour figer le trajet parcouru, puis rejouer ce trajet à
+   l'identique (**Point B** depuis A) ou en sens inverse (**Point A** depuis
+   B). Le rejeu est géré entièrement côté app (répétition des commandes
+   manuelles existantes), sans nouvelle commande firmware.
 
 ## Protocole BLE
 
@@ -78,8 +107,10 @@ ligne (`\n`) :
 | `F<cm>` `B<cm>` `L<°>` `R<°>` `W<s>` | tokens de séquence |
 | `MF` `MB` `ML` `MR` `MS` | pilotage manuel live (watchdog 500 ms) |
 | `SPEED <0-255>` | vitesse | `STOP` | arrêt | `STATUS` | état |
+| `AUTO` | mode déplacement automatique : avance tout droit, tourne sur place à droite en continu tant qu'un obstacle est détecté (`SEUIL_OBSTACLE_CM`), reprend tout droit une fois la voie dégagée ; boucle jusqu'à `STOP` ou toute commande manuelle |
 
-Télémétrie renvoyée : `[T]24.5C [H]40% [D]35cm [S]EXEC 1/3`.
+Télémétrie renvoyée : `[T]24.5C [H]40% [D]35cm [S]EXEC 1/3` (`[S]` vaut
+`AUTO` quand le mode déplacement automatique est actif).
 
 ## Calibration
 

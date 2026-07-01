@@ -47,6 +47,16 @@ void test_manuel() {
     TEST_ASSERT_EQUAL(static_cast<int>(ManualDir::Forward), static_cast<int>(c.manual));
 }
 
+void test_auto() {
+    ParsedCommand c1 = parseCommand("AUTO");
+    TEST_ASSERT_TRUE(c1.ok);
+    TEST_ASSERT_EQUAL(static_cast<int>(CommandKind::Auto), static_cast<int>(c1.kind));
+
+    ParsedCommand c2 = parseCommand("auto");
+    TEST_ASSERT_TRUE(c2.ok);
+    TEST_ASSERT_EQUAL(static_cast<int>(CommandKind::Auto), static_cast<int>(c2.kind));
+}
+
 void test_token_invalide_rejette_toute_la_sequence() {
     ParsedCommand c = parseCommand("F200 X10");
     TEST_ASSERT_FALSE(c.ok);
@@ -66,6 +76,7 @@ int main(int, char**) {
     RUN_TEST(test_speed);
     RUN_TEST(test_speed_hors_bornes_rejete);
     RUN_TEST(test_manuel);
+    RUN_TEST(test_auto);
     RUN_TEST(test_token_invalide_rejette_toute_la_sequence);
     RUN_TEST(test_ligne_vide_rejetee);
     return UNITY_END();

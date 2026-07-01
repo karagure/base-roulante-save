@@ -3,7 +3,7 @@
 #include <vector>
 #include "Motion.h"
 
-enum class CommandKind { Sequence, Manual, Stop, Status, Speed, Unknown };
+enum class CommandKind { Sequence, Manual, Stop, Status, Speed, Auto, Unknown };
 enum class ManualDir  { Forward, Backward, Left, Right, Stop };
 
 struct ParsedCommand {

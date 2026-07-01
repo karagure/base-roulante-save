@@ -1,25 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.dir').forEach((b) => {
-    const dir = b.dataset.dir;   // MF, MB, ML, MR, MS
-    let timer = null;
+  const DIR_TO_CMD = { F: 'MF', B: 'MB', L: 'ML', R: 'MR' };
+  const REPEAT_MS = 200; // < watchdog firmware (500ms)
 
-    const start = (e) => {
-      e.preventDefault();
-      RobotBle.sendLine(dir);
-      if (dir !== 'MS') {
-        timer = setInterval(() => RobotBle.sendLine(dir), 250);
-      }
-    };
-    const stop = () => {
-      if (timer) { clearInterval(timer); timer = null; }
-      if (dir !== 'MS') RobotBle.sendLine('MS');
-    };
+  const baseEl = document.getElementById('joystick-base');
+  const knobEl = document.getElementById('joystick-knob');
 
-    b.addEventListener('mousedown', start);
-    b.addEventListener('touchstart', start, { passive: false });
-    b.addEventListener('mouseup', stop);
-    b.addEventListener('mouseleave', stop);
-    b.addEventListener('touchend', stop);
+  let repeatTimer = null;
+  const stopRepeat = () => { if (repeatTimer) { clearInterval(repeatTimer); repeatTimer = null; } };
+
+  createJoystick(baseEl, knobEl, (dir) => {
+    stopRepeat();
+    if (dir === null) {
+      RobotBle.sendLine('MS');
+      return;
+    }
+    const cmd = DIR_TO_CMD[dir];
+    RobotBle.sendLine(cmd);
+    repeatTimer = setInterval(() => RobotBle.sendLine(cmd), REPEAT_MS);
   });
 
   const speed    = document.getElementById('speed');

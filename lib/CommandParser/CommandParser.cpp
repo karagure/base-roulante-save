@@ -62,6 +62,7 @@ ParsedCommand parseCommand(const std::string& raw) {
 
     if (up == "STOP")   { ParsedCommand c; c.kind = CommandKind::Stop;   c.ok = true; return c; }
     if (up == "STATUS") { ParsedCommand c; c.kind = CommandKind::Status; c.ok = true; return c; }
+    if (up == "AUTO")   { ParsedCommand c; c.kind = CommandKind::Auto;   c.ok = true; return c; }
 
     // Manuel : MF / MB / ML / MR / MS
     if (up.size() == 2 && up[0] == 'M') {

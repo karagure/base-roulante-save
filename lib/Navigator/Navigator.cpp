@@ -11,6 +11,7 @@ void Navigator::begin() {
     _state = NavState::Idle;
     _index = 0;
     _path.clear();
+    _autoAvoiding = false;
 }
 
 void Navigator::setSpeed(int speed) {
@@ -32,10 +33,19 @@ void Navigator::setPath(const std::vector<Move>& moves) {
     startCurrentMove();
 }
 
+void Navigator::startAuto() {
+    _path.clear();
+    _index = 0;
+    _autoAvoiding = false;
+    _state = NavState::AutoAvoid;
+    _drive.forward(_speed);
+}
+
 void Navigator::stopAll() {
     _drive.stop();
     _path.clear();
     _index = 0;
+    _autoAvoiding = false;
     _state = NavState::Idle;
 }
 
@@ -57,6 +67,18 @@ void Navigator::startCurrentMove() {
 
 void Navigator::update() {
     if (_state == NavState::Idle) return;
+
+    if (_state == NavState::AutoAvoid) {
+        bool obstacle = _sonar.readDistanceCm() < SEUIL_OBSTACLE_CM;
+        if (obstacle && !_autoAvoiding) {
+            _autoAvoiding = true;
+            _drive.turnRight(_speed);
+        } else if (!obstacle && _autoAvoiding) {
+            _autoAvoiding = false;
+            _drive.forward(_speed);
+        }
+        return;
+    }
 
     if (_state == NavState::ObstacleHold) {
         if (_sonar.readDistanceCm() >= SEUIL_OBSTACLE_CM) {   // voie dégagée -> reprise
