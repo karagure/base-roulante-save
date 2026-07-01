@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Base roulante — Télécommande &amp; Code bloc</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Base roulante</h1>
+    <div class="conn">
+      <button id="btn-connect">Connecter (BLE)</button>
+      <span id="status" class="status off">Déconnecté</span>
+    </div>
+    <div id="telemetry" class="telemetry">—</div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="remote">Télécommande</button>
+    <button class="tab" data-tab="blocks">Code bloc</button>
+  </nav>
+
+  <section id="tab-remote" class="tab-panel active">
+    <div class="pad">
+      <button class="dir" data-dir="MF">▲</button>
+      <div class="pad-mid">
+        <button class="dir" data-dir="ML">◄</button>
+        <button class="dir stop" data-dir="MS">■</button>
+        <button class="dir" data-dir="MR">►</button>
+      </div>
+      <button class="dir" data-dir="MB">▼</button>
+    </div>
+    <div class="speed-row">
+      <label for="speed">Vitesse :</label>
+      <input type="range" id="speed" min="0" max="255" value="200">
+      <span id="speed-val">200</span>
+    </div>
+  </section>
+
+  <section id="tab-blocks" class="tab-panel">
+    <div id="blockly"></div>
+    <div class="blocks-actions">
+      <button id="btn-run">Exécuter ▶</button>
+      <button id="btn-stop">STOP ■</button>
+      <code id="preview"></code>
+    </div>
+  </section>
+
+  <script src="js/ble.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/remote.js"></script>
+  <script src="js/blocks.js"></script>
+</body>
+</html>

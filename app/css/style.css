@@ -1,0 +1,62 @@
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  background: #f4f5f7;
+  color: #1c2733;
+}
+header {
+  background: #1c2733;
+  color: #fff;
+  padding: 12px 16px;
+}
+header h1 { margin: 0 0 8px; font-size: 1.3rem; }
+.conn { display: flex; align-items: center; gap: 12px; }
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 1rem;
+  background: #2d7dd2;
+  color: #fff;
+}
+button:disabled { background: #888; cursor: not-allowed; }
+.status { padding: 4px 10px; border-radius: 12px; font-size: .85rem; }
+.status.off { background: #7a2e2e; }
+.status.on  { background: #2e7a3f; }
+.telemetry {
+  margin-top: 8px;
+  font-family: monospace;
+  font-size: .9rem;
+  opacity: .9;
+}
+.tabs { display: flex; background: #e3e6ea; }
+.tab {
+  flex: 1;
+  background: transparent;
+  color: #1c2733;
+  border-radius: 0;
+}
+.tab.active { background: #fff; font-weight: 600; }
+.tab-panel { display: none; padding: 16px; }
+.tab-panel.active { display: block; }
+
+/* Télécommande */
+.pad { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.pad-mid { display: flex; gap: 8px; }
+.dir {
+  width: 70px; height: 70px;
+  font-size: 1.6rem;
+  background: #2d7dd2;
+  user-select: none;
+  touch-action: none;
+}
+.dir.stop { background: #c0392b; }
+.speed-row { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
+
+/* Blockly */
+#blockly { height: 420px; width: 100%; background: #fff; border: 1px solid #ccc; }
+.blocks-actions { margin-top: 12px; display: flex; align-items: center; gap: 12px; }
+#btn-stop { background: #c0392b; }
+#preview { font-family: monospace; background: #fff; padding: 6px 10px; border-radius: 4px; }
