@@ -28,11 +28,20 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPosition = 'A';
   let replaying = false;
 
+  function debug(scope, data) {
+    if (window.debugRobot) {
+      window.debugRobot(scope, data);
+    } else {
+      console.debug(scope, data);
+    }
+  }
+
   function stopRepeat() {
     if (repeatTimer) {
       clearInterval(repeatTimer);
       repeatTimer = null;
-      window.debugRobot && window.debugRobot('RECORD_REPEAT_STOP', {});
+
+      debug('RECORD_REPEAT_STOP', {});
     }
   }
 
@@ -53,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
           durationMs
         };
 
-        window.debugRobot && window.debugRobot('RECORD_STEP', step);
+        debug('RECORD_STEP', step);
 
         steps.push(step);
         logStep(step);
@@ -92,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function playStep(step) {
     const cmd = DIR_TO_CMD[step.dir];
 
-    window.debugRobot && window.debugRobot('REPLAY_STEP_START', {
+    debug('REPLAY_STEP_START', {
       ...step,
       cmd
     });
@@ -100,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     RobotBle.sendLine(cmd);
 
     const timer = setInterval(() => {
-      window.debugRobot && window.debugRobot('REPLAY_REPEAT', {
+      debug('REPLAY_REPEAT', {
         ...step,
         cmd
       });
@@ -112,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clearInterval(timer);
 
-    window.debugRobot && window.debugRobot('REPLAY_STEP_STOP', {
+    debug('REPLAY_STEP_STOP', {
       ...step,
       cmd: 'MS'
     });
@@ -126,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     replaying = true;
     setControlsEnabled(false);
 
-    window.debugRobot && window.debugRobot('REPLAY_TRIP_START', {
+    debug('REPLAY_TRIP_START', {
       trip,
       resultingPosition
     });
@@ -140,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePositionUI();
     setControlsEnabled(true);
 
-    window.debugRobot && window.debugRobot('REPLAY_TRIP_END', {
+    debug('REPLAY_TRIP_END', {
       currentPosition
     });
   }
@@ -153,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closeSegment();
 
     if (dir === null) {
-      window.debugRobot && window.debugRobot('RECORD_CMD', {
+      debug('RECORD_CMD', {
         dir,
         cmd: 'MS'
       });
@@ -165,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cmd = DIR_TO_CMD[dir];
 
-    window.debugRobot && window.debugRobot('RECORD_CMD', {
+    debug('RECORD_CMD', {
       dir,
       cmd
     });
@@ -173,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     RobotBle.sendLine(cmd);
 
     repeatTimer = setInterval(() => {
-      window.debugRobot && window.debugRobot('RECORD_REPEAT', {
+      debug('RECORD_REPEAT', {
         dir,
         cmd
       });
@@ -191,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     stopRepeat();
     closeSegment();
 
-    window.debugRobot && window.debugRobot('RECORD_VALIDATE', {
+    debug('RECORD_VALIDATE', {
       steps
     });
 
@@ -208,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnPointA.addEventListener('click', () => {
     if (replaying || currentPosition !== 'B' || steps.length === 0) return;
 
-    window.debugRobot && window.debugRobot('POINT_A_CLICK', {
+    debug('POINT_A_CLICK', {
       steps
     });
 
@@ -218,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnPointB.addEventListener('click', () => {
     if (replaying || currentPosition !== 'A' || steps.length === 0) return;
 
-    window.debugRobot && window.debugRobot('POINT_B_CLICK', {
+    debug('POINT_B_CLICK', {
       steps
     });
 
@@ -230,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     stopRepeat();
 
-    window.debugRobot && window.debugRobot('RECORD_CLEAR', {});
+    debug('RECORD_CLEAR', {});
 
     RobotBle.sendLine('MS');
 

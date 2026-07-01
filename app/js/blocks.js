@@ -76,11 +76,26 @@
   // reculer        -> L
   // tourner gauche -> F
   // tourner droite -> B
+
+  // Calibration des rotations :
+  // Observation : pour obtenir environ 90° réels,
+  // il faut envoyer environ 15° au robot.
+  //
+  // Facteur = 11 / 90 = 0.122
+  // Ajuste si besoin :
+  // - si le robot tourne encore trop : baisse à 0.15
+  // - si le robot ne tourne pas assez : monte à 0.18 ou 0.20
+  const TURN_FACTOR = 0.12;
+
+  function calibratedTurnAngle(n) {
+    return Math.round(n * TURN_FACTOR);
+  }
+
   const TOKEN = {
     avancer:        n => 'R' + n,
     reculer:        n => 'L' + n,
-    tourner_gauche: n => 'F' + n,
-    tourner_droite: n => 'B' + n,
+    tourner_gauche: n => 'F' + calibratedTurnAngle(n),
+    tourner_droite: n => 'B' + calibratedTurnAngle(n),
     attendre:       n => 'W' + n
   };
 
@@ -100,17 +115,24 @@
 
       if (t === 'vitesse') {
         out.speed = n;
-        debugBlock('BLOCK_SPEED', { speed: n });
+
+        debugBlock('BLOCK_SPEED', {
+          speed: n
+        });
       } else if (t === 'repeter') {
         const inner = block.getInputTargetBlock('DO');
 
-        debugBlock('BLOCK_REPEAT_START', { count: n });
+        debugBlock('BLOCK_REPEAT_START', {
+          count: n
+        });
 
         for (let i = 0; i < n; i++) {
           walk(inner, out);
         }
 
-        debugBlock('BLOCK_REPEAT_END', { count: n });
+        debugBlock('BLOCK_REPEAT_END', {
+          count: n
+        });
       } else if (TOKEN[t]) {
         const token = TOKEN[t](n);
 
@@ -173,6 +195,7 @@
         debugBlock('BLOCK_RUN_SKIPPED', {
           reason: 'workspace-not-ready'
         });
+
         return;
       }
 

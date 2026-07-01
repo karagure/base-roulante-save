@@ -17,7 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (repeatTimer) {
       clearInterval(repeatTimer);
       repeatTimer = null;
-      window.debugRobot && window.debugRobot('REMOTE_REPEAT_STOP', {});
+
+      if (window.debugRobot) {
+        window.debugRobot('REMOTE_REPEAT_STOP', {});
+      }
     }
   };
 
@@ -25,10 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
     stopRepeat();
 
     if (dir === null) {
-      window.debugRobot && window.debugRobot('REMOTE_CMD', {
-        dir,
-        cmd: 'MS'
-      });
+      if (window.debugRobot) {
+        window.debugRobot('REMOTE_CMD', {
+          dir,
+          cmd: 'MS'
+        });
+      }
 
       RobotBle.sendLine('MS');
       return;
@@ -36,18 +41,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cmd = DIR_TO_CMD[dir];
 
-    window.debugRobot && window.debugRobot('REMOTE_CMD', {
-      dir,
-      cmd
-    });
+    if (window.debugRobot) {
+      window.debugRobot('REMOTE_CMD', {
+        dir,
+        cmd
+      });
+    }
 
     RobotBle.sendLine(cmd);
 
     repeatTimer = setInterval(() => {
-      window.debugRobot && window.debugRobot('REMOTE_REPEAT', {
-        dir,
-        cmd
-      });
+      if (window.debugRobot) {
+        window.debugRobot('REMOTE_REPEAT', {
+          dir,
+          cmd
+        });
+      }
 
       RobotBle.sendLine(cmd);
     }, REPEAT_MS);
@@ -61,9 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   speed.addEventListener('change', () => {
-    window.debugRobot && window.debugRobot('REMOTE_SPEED', {
-      speed: speed.value
-    });
+    if (window.debugRobot) {
+      window.debugRobot('REMOTE_SPEED', {
+        speed: speed.value
+      });
+    }
 
     RobotBle.sendLine('SPEED ' + speed.value);
   });

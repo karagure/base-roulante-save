@@ -1,40 +1,27 @@
 // Joystick virtuel générique : ne connaît rien au BLE, informe juste
 // l'appelant du changement de direction via onDirChange('F'|'B'|'L'|'R'|null).
 
-window.debugRobot = window.debugRobot || function debugRobot(scope, data) {
-  const line = '[' + new Date().toLocaleTimeString() + '] ' + scope + ' ' + JSON.stringify(data);
-  console.debug(line);
-
-  let panel = document.getElementById('debug-panel');
-  if (!panel && document.body) {
-    panel = document.createElement('pre');
-    panel.id = 'debug-panel';
-    panel.style.cssText =
-      'position:fixed;left:8px;right:8px;bottom:8px;max-height:35vh;overflow:auto;' +
-      'background:#111;color:#0f0;padding:8px;z-index:99999;font:12px/1.4 monospace;' +
-      'border-radius:6px;opacity:.92;';
-    document.body.appendChild(panel);
-  }
-
-  if (panel) {
-    panel.textContent += line + '\n';
-    panel.scrollTop = panel.scrollHeight;
-  }
-};
-
 function createJoystick(baseEl, knobEl, onDirChange) {
-  const DEAD_ZONE_RATIO = 0.25; // ~25% du rayon autour du centre = pas de commande
+  const DEAD_ZONE_RATIO = 0.35; // zone morte augmentée pour éviter les petits déclenchements involontaires
 
   let active = false;
   let pointerId = null;
   let currentDir = null;
+
+  function debug(scope, data) {
+    if (window.debugRobot) {
+      window.debugRobot(scope, data);
+    } else {
+      console.debug(scope, data);
+    }
+  }
 
   function setDir(dir, meta = {}) {
     if (dir !== currentDir) {
       const previousDir = currentDir;
       currentDir = dir;
 
-      window.debugRobot('JOYSTICK_DIR', {
+      debug('JOYSTICK_DIR', {
         previousDir,
         dir,
         ...meta
@@ -82,6 +69,7 @@ function createJoystick(baseEl, knobEl, onDirChange) {
         ...meta,
         reason: 'dead-zone'
       });
+
       return;
     }
 
@@ -97,7 +85,7 @@ function createJoystick(baseEl, knobEl, onDirChange) {
     pointerId = e.pointerId;
     baseEl.setPointerCapture(pointerId);
 
-    window.debugRobot('POINTER_DOWN', {
+    debug('POINTER_DOWN', {
       pointerId,
       x: Math.round(e.clientX),
       y: Math.round(e.clientY)
@@ -117,13 +105,18 @@ function createJoystick(baseEl, knobEl, onDirChange) {
   function release(e) {
     if (!active || (e && e.pointerId !== pointerId)) return;
 
-    window.debugRobot('POINTER_UP', { pointerId });
+    debug('POINTER_UP', {
+      pointerId
+    });
 
     active = false;
     pointerId = null;
+
     resetKnob();
 
-    setDir(null, { reason: 'release' });
+    setDir(null, {
+      reason: 'release'
+    });
   }
 
   baseEl.addEventListener('pointerdown', onPointerDown);
