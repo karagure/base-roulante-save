@@ -1,9 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const DIR_TO_CMD  = { F: 'MF', B: 'MB', L: 'ML', R: 'MR' };
+  // Mapping corrigé selon le comportement réel du robot :
+  // MF = gauche
+  // MB = droite
+  // MR = avance
+  // ML = recule
+  const DIR_TO_CMD   = { F: 'MR', B: 'ML', L: 'MF', R: 'MB' };
+
   const OPPOSITE_DIR = { F: 'B', B: 'F', L: 'R', R: 'L' };
   const DIR_LABEL    = { F: 'Avance', B: 'Recule', L: 'Tourne gauche', R: 'Tourne droite' };
-  const REPEAT_MS   = 200;  // < watchdog firmware (500ms)
-  const STEP_GAP_MS = 150;  // pause entre deux étapes rejouées
+  const REPEAT_MS    = 200; // < watchdog firmware (500ms)
+  const STEP_GAP_MS  = 150; // pause entre deux étapes rejouées
 
   const baseEl      = document.getElementById('joystick-base');
   const knobEl      = document.getElementById('joystick-knob');
@@ -23,7 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let replaying = false;
 
   function stopRepeat() {
-    if (repeatTimer) { clearInterval(repeatTimer); repeatTimer = null; }
+    if (repeatTimer) {
+      clearInterval(repeatTimer);
+      repeatTimer = null;
+      window.debugRobot && window.debugRobot('RECORD_REPEAT_STOP', {});
+    }
   }
 
   function logStep(step) {
@@ -36,8 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeSegment() {
     if (recording && currentDir !== null) {
       const durationMs = Date.now() - segmentStart;
+
       if (durationMs > 0) {
-        const step = { dir: currentDir, durationMs };
+        const step = {
+          dir: currentDir,
+          durationMs
+        };
+
+        window.debugRobot && window.debugRobot('RECORD_STEP', step);
+
         steps.push(step);
         logStep(step);
       }
@@ -59,7 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function reverseTrip(trip) {
-    return trip.slice().reverse().map((s) => ({ dir: OPPOSITE_DIR[s.dir], durationMs: s.durationMs }));
+    return trip
+      .slice()
+      .reverse()
+      .map((s) => ({
+        dir: OPPOSITE_DIR[s.dir],
+        durationMs: s.durationMs
+      }));
   }
 
   function delay(ms) {
@@ -68,77 +91,156 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function playStep(step) {
     const cmd = DIR_TO_CMD[step.dir];
+
+    window.debugRobot && window.debugRobot('REPLAY_STEP_START', {
+      ...step,
+      cmd
+    });
+
     RobotBle.sendLine(cmd);
-    const timer = setInterval(() => RobotBle.sendLine(cmd), REPEAT_MS);
+
+    const timer = setInterval(() => {
+      window.debugRobot && window.debugRobot('REPLAY_REPEAT', {
+        ...step,
+        cmd
+      });
+
+      RobotBle.sendLine(cmd);
+    }, REPEAT_MS);
+
     await delay(step.durationMs);
+
     clearInterval(timer);
+
+    window.debugRobot && window.debugRobot('REPLAY_STEP_STOP', {
+      ...step,
+      cmd: 'MS'
+    });
+
     RobotBle.sendLine('MS');
+
     await delay(STEP_GAP_MS);
   }
 
   async function playTrip(trip, resultingPosition) {
     replaying = true;
     setControlsEnabled(false);
+
+    window.debugRobot && window.debugRobot('REPLAY_TRIP_START', {
+      trip,
+      resultingPosition
+    });
+
     for (const step of trip) {
       await playStep(step);
     }
+
     replaying = false;
     currentPosition = resultingPosition;
     updatePositionUI();
     setControlsEnabled(true);
+
+    window.debugRobot && window.debugRobot('REPLAY_TRIP_END', {
+      currentPosition
+    });
   }
 
   // --- Joystick : pilotage direct + enregistrement des segments ---
   createJoystick(baseEl, knobEl, (dir) => {
     if (replaying) return;
+
     stopRepeat();
     closeSegment();
 
     if (dir === null) {
+      window.debugRobot && window.debugRobot('RECORD_CMD', {
+        dir,
+        cmd: 'MS'
+      });
+
       RobotBle.sendLine('MS');
       currentDir = null;
       return;
     }
 
     const cmd = DIR_TO_CMD[dir];
+
+    window.debugRobot && window.debugRobot('RECORD_CMD', {
+      dir,
+      cmd
+    });
+
     RobotBle.sendLine(cmd);
-    repeatTimer = setInterval(() => RobotBle.sendLine(cmd), REPEAT_MS);
+
+    repeatTimer = setInterval(() => {
+      window.debugRobot && window.debugRobot('RECORD_REPEAT', {
+        dir,
+        cmd
+      });
+
+      RobotBle.sendLine(cmd);
+    }, REPEAT_MS);
+
     currentDir = dir;
     segmentStart = Date.now();
   });
 
   btnRecord.addEventListener('click', () => {
     if (replaying) return;
+
     stopRepeat();
     closeSegment();
+
+    window.debugRobot && window.debugRobot('RECORD_VALIDATE', {
+      steps
+    });
+
     RobotBle.sendLine('MS');
+
     currentDir = null;
     recording = false;
     currentPosition = 'B';
     btnPointB.hidden = false;
+
     updatePositionUI();
   });
 
   btnPointA.addEventListener('click', () => {
     if (replaying || currentPosition !== 'B' || steps.length === 0) return;
+
+    window.debugRobot && window.debugRobot('POINT_A_CLICK', {
+      steps
+    });
+
     playTrip(reverseTrip(steps), 'A');
   });
 
   btnPointB.addEventListener('click', () => {
     if (replaying || currentPosition !== 'A' || steps.length === 0) return;
+
+    window.debugRobot && window.debugRobot('POINT_B_CLICK', {
+      steps
+    });
+
     playTrip(steps, 'B');
   });
 
   btnClear.addEventListener('click', () => {
     if (replaying) return;
+
     stopRepeat();
+
+    window.debugRobot && window.debugRobot('RECORD_CLEAR', {});
+
     RobotBle.sendLine('MS');
+
     steps = [];
     recording = true;
     currentDir = null;
     currentPosition = 'A';
     btnPointB.hidden = true;
     logEl.innerHTML = '';
+
     updatePositionUI();
   });
 
