@@ -29,10 +29,10 @@
   ]);
 
   const TOKEN = {
-    avancer:        n => 'R' + n,
-    reculer:        n => 'L' + n,
-    tourner_gauche: n => 'F' + n,
-    tourner_droite: n => 'B' + n,
+    avancer:        n => 'F' + n,
+    reculer:        n => 'B' + n,
+    tourner_gauche: n => 'L' + n,
+    tourner_droite: n => 'R' + n,
     attendre:       n => 'W' + n
   };
 
