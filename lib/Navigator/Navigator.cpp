@@ -21,6 +21,22 @@ void Navigator::setSpeed(int speed) {
     if (_state == NavState::Executing) applyMotors(_path[_index]);  // effet immédiat
 }
 
+void Navigator::setAutoSpeed(int speed) {
+    if (speed < 0)   speed = 0;
+    if (speed > 255) speed = 255;
+    _autoSpeed = speed;
+    if (_state == NavState::AutoAvoid) {   // effet immédiat
+        if (_autoAvoiding) _drive.turnRight(_autoSpeed);
+        else               _drive.forward(_autoSpeed);
+    }
+}
+
+void Navigator::setObstacleThresholdCm(int cm) {
+    if (cm < 2)                          cm = 2;
+    if (cm > ULTRASON_HORS_PORTEE_CM)    cm = ULTRASON_HORS_PORTEE_CM;
+    _obstacleThresholdCm = cm;
+}
+
 void Navigator::setPath(const std::vector<Move>& moves) {
     _path = moves;
     _index = 0;
@@ -38,7 +54,7 @@ void Navigator::startAuto() {
     _index = 0;
     _autoAvoiding = false;
     _state = NavState::AutoAvoid;
-    _drive.forward(_speed);
+    _drive.forward(_autoSpeed);
 }
 
 void Navigator::stopAll() {
@@ -69,13 +85,13 @@ void Navigator::update() {
     if (_state == NavState::Idle) return;
 
     if (_state == NavState::AutoAvoid) {
-        bool obstacle = _sonar.readDistanceCm() < SEUIL_OBSTACLE_CM;
+        bool obstacle = _sonar.readDistanceCm() < _obstacleThresholdCm;
         if (obstacle && !_autoAvoiding) {
             _autoAvoiding = true;
-            _drive.turnRight(_speed);
+            _drive.turnRight(_autoSpeed);
         } else if (!obstacle && _autoAvoiding) {
             _autoAvoiding = false;
-            _drive.forward(_speed);
+            _drive.forward(_autoSpeed);
         }
         return;
     }

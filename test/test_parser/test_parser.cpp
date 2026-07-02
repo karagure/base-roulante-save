@@ -40,6 +40,32 @@ void test_speed_hors_bornes_rejete() {
     TEST_ASSERT_FALSE(c.ok);
 }
 
+void test_autospeed() {
+    ParsedCommand c = parseCommand("AUTOSPEED 120");
+    TEST_ASSERT_TRUE(c.ok);
+    TEST_ASSERT_EQUAL(static_cast<int>(CommandKind::AutoSpeed), static_cast<int>(c.kind));
+    TEST_ASSERT_EQUAL_INT(120, c.speed);
+}
+
+void test_autospeed_hors_bornes_rejete() {
+    ParsedCommand c = parseCommand("AUTOSPEED 999");
+    TEST_ASSERT_FALSE(c.ok);
+}
+
+void test_autothreshold() {
+    ParsedCommand c = parseCommand("AUTOTHRESHOLD 35");
+    TEST_ASSERT_TRUE(c.ok);
+    TEST_ASSERT_EQUAL(static_cast<int>(CommandKind::AutoThreshold), static_cast<int>(c.kind));
+    TEST_ASSERT_EQUAL_INT(35, c.thresholdCm);
+}
+
+void test_autothreshold_hors_bornes_rejete() {
+    ParsedCommand c1 = parseCommand("AUTOTHRESHOLD 1");
+    TEST_ASSERT_FALSE(c1.ok);
+    ParsedCommand c2 = parseCommand("AUTOTHRESHOLD 500");
+    TEST_ASSERT_FALSE(c2.ok);
+}
+
 void test_manuel() {
     ParsedCommand c = parseCommand("MF");
     TEST_ASSERT_TRUE(c.ok);
@@ -75,6 +101,10 @@ int main(int, char**) {
     RUN_TEST(test_stop);
     RUN_TEST(test_speed);
     RUN_TEST(test_speed_hors_bornes_rejete);
+    RUN_TEST(test_autospeed);
+    RUN_TEST(test_autospeed_hors_bornes_rejete);
+    RUN_TEST(test_autothreshold);
+    RUN_TEST(test_autothreshold_hors_bornes_rejete);
     RUN_TEST(test_manuel);
     RUN_TEST(test_auto);
     RUN_TEST(test_token_invalide_rejette_toute_la_sequence);

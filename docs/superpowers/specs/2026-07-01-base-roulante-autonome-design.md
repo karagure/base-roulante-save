@@ -174,7 +174,10 @@ Boucle `loop()`, non-bloquante, à chaque itération :
 | `W<val>`             | attendre `<val>` secondes (bloc « Attendre ») |
 | `STOP`               | arrêt immédiat, vide la file, retour IDLE |
 | `STATUS`             | renvoie état + température + distance |
-| `SPEED <0-255>`      | règle la vitesse de déplacement |
+| `SPEED <0-255>`      | règle la vitesse de déplacement (séquences / manuel) |
+| `AUTO`                | démarre le mode déplacement autonome (avance + évitement d'obstacle par rotation) |
+| `AUTOSPEED <0-255>`  | règle la vitesse utilisée **uniquement** en mode `AUTO` (indépendante de `SPEED`) |
+| `AUTOTHRESHOLD <2-400>` | règle le seuil de détection d'obstacle (cm) utilisé **uniquement** en mode `AUTO` (indépendant de `SEUIL_OBSTACLE_CM`) |
 | `MF` / `MB` / `ML` / `MR` | **pilotage manuel live** : avance/recule/gauche/droite en continu (soumis au watchdog 500 ms) |
 | `MS`                 | stop manuel |
 
@@ -201,6 +204,12 @@ Constantes de calibration (valeurs de départ, à calibrer, commentées) :
 `MS_PAR_CM`, `MS_PAR_DEGRE`, `SEUIL_OBSTACLE_CM`, `VITESSE_DEFAUT`,
 `WATCHDOG_MANUEL_MS = 500`, cadence de télémétrie. UUID BLE (`FFE0`/`FFE1`) et
 nom du périphérique.
+
+Le mode `AUTO` a sa propre vitesse (`_autoSpeed`, init. à `VITESSE_DEFAUT`) et son
+propre seuil d'obstacle (`_obstacleThresholdCm`, init. à `SEUIL_OBSTACLE_CM`) dans
+`Navigator`, réglables à l'exécution via les commandes `AUTOSPEED`/`AUTOTHRESHOLD`
+(voir section 6) sans toucher aux constantes de `Config.h` ni au réglage `SPEED`
+des séquences/manuel.
 
 ## 8. Gestion d'erreurs
 

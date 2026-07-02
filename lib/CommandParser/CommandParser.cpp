@@ -78,6 +78,22 @@ ParsedCommand parseCommand(const std::string& raw) {
         ParsedCommand c; c.kind = CommandKind::Manual; c.manual = d; c.ok = true; return c;
     }
 
+    // AUTOSPEED n (vitesse utilisée uniquement en mode AUTO)
+    if (up.rfind("AUTOSPEED", 0) == 0) {
+        std::string rest = trim(line.substr(9));
+        int v;
+        if (!parseUint(rest, 0, v) || v < 0 || v > 255) return err("vitesse auto invalide (0..255)");
+        ParsedCommand c; c.kind = CommandKind::AutoSpeed; c.speed = v; c.ok = true; return c;
+    }
+
+    // AUTOTHRESHOLD n (seuil de détection d'obstacle en cm, utilisé uniquement en mode AUTO)
+    if (up.rfind("AUTOTHRESHOLD", 0) == 0) {
+        std::string rest = trim(line.substr(13));
+        int v;
+        if (!parseUint(rest, 0, v) || v < 2 || v > 400) return err("seuil invalide (2..400)");
+        ParsedCommand c; c.kind = CommandKind::AutoThreshold; c.thresholdCm = v; c.ok = true; return c;
+    }
+
     // SPEED n
     if (up.rfind("SPEED", 0) == 0) {
         std::string rest = trim(line.substr(5));

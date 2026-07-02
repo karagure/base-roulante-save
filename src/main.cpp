@@ -66,6 +66,14 @@ void handleLine(const std::string& line) {
             nav.setSpeed(c.speed);
             ble.notify("OK SPEED");
             break;
+        case CommandKind::AutoSpeed:
+            nav.setAutoSpeed(c.speed);
+            ble.notify("OK AUTOSPEED");
+            break;
+        case CommandKind::AutoThreshold:
+            nav.setObstacleThresholdCm(c.thresholdCm);
+            ble.notify("OK AUTOTHRESHOLD");
+            break;
         case CommandKind::Manual:
             nav.stopAll();            // une commande manuelle interrompt toute séquence
             driveManual(c.manual);

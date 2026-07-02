@@ -42,6 +42,16 @@
       <button id="btn-auto-start">Mode déplacement autonome</button>
       <button id="btn-auto-stop" class="danger">Arrêt mode autonome</button>
       <p>État : <span id="auto-indicator" class="status off">Inactif</span></p>
+      <div class="speed-row">
+        <label for="auto-speed">Vitesse (mode auto) :</label>
+        <input type="range" id="auto-speed" min="0" max="255" value="200">
+        <span id="auto-speed-val">200</span>
+      </div>
+      <div class="speed-row">
+        <label for="auto-threshold">Seuil obstacle (cm) :</label>
+        <input type="range" id="auto-threshold" min="2" max="400" value="20">
+        <span id="auto-threshold-val">20</span>
+      </div>
     </div>
   </section>
 

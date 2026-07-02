@@ -15,6 +15,8 @@ public:
     void setPath(const std::vector<Move>& moves);
     void startAuto();                    // démarre le mode déplacement automatique
     void setSpeed(int speed);            // 0..255
+    void setAutoSpeed(int speed);        // 0..255, vitesse utilisée uniquement en mode AUTO
+    void setObstacleThresholdCm(int cm); // seuil de détection d'obstacle utilisé uniquement en mode AUTO
     void stopAll();                      // arrêt + vide la file
     void update();                       // non-bloquant, à appeler chaque loop()
     NavState state() const { return _state; }
@@ -27,6 +29,8 @@ private:
     size_t            _index = 0;
     NavState          _state = NavState::Idle;
     int               _speed = VITESSE_DEFAUT;
+    int               _autoSpeed = VITESSE_DEFAUT;
+    int               _obstacleThresholdCm = SEUIL_OBSTACLE_CM;
     unsigned long     _moveStart = 0;      // millis() du (re)démarrage du move courant
     unsigned long     _remainingMs = 0;    // durée restante du move courant
     bool              _autoAvoiding = false; // true tant que le mode auto tourne pour éviter un obstacle

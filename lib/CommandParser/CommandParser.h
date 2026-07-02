@@ -3,13 +3,14 @@
 #include <vector>
 #include "Motion.h"
 
-enum class CommandKind { Sequence, Manual, Stop, Status, Speed, Auto, Unknown };
+enum class CommandKind { Sequence, Manual, Stop, Status, Speed, Auto, AutoSpeed, AutoThreshold, Unknown };
 enum class ManualDir  { Forward, Backward, Left, Right, Stop };
 
 struct ParsedCommand {
     CommandKind kind = CommandKind::Unknown;
     std::vector<Move> moves;              // rempli si kind == Sequence
-    int speed = 0;                        // rempli si kind == Speed
+    int speed = 0;                        // rempli si kind == Speed ou AutoSpeed
+    int thresholdCm = 0;                  // rempli si kind == AutoThreshold
     ManualDir manual = ManualDir::Stop;   // rempli si kind == Manual
     bool ok = false;
     std::string error;
