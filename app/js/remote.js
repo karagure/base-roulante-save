@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const DIR_TO_CMD = { F: 'MR', B: 'ML', L: 'MF', R: 'MB' };
+  const DIR_TO_CMD = { F: 'MF', B: 'MB', L: 'ML', R: 'MR' };
   const REPEAT_MS = 200; // < watchdog firmware (500ms)
 
   const baseEl = document.getElementById('joystick-base');
